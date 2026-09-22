@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Video Downloader</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Video Downloader</h1>
+    <p>Paste a public Facebook or YouTube video link and download it as MP4.</p>
+
+    <form id="download-form">
+      <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=..." required />
+      <button type="submit" id="submit-btn">Download</button>
+    </form>
+
+    <p id="status"></p>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

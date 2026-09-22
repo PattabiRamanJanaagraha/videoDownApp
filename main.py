@@ -5,13 +5,17 @@ from urllib.parse import urlparse
 import yt_dlp
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.background import BackgroundTask
 
 app = FastAPI()
 
-DOWNLOAD_DIR = Path(__file__).parent / "downloads"
+BASE_DIR = Path(__file__).parent
+DOWNLOAD_DIR = BASE_DIR / "downloads"
 DOWNLOAD_DIR.mkdir(exist_ok=True)
+
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 FACEBOOK_HOSTS = {"facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch"}
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
@@ -29,6 +33,11 @@ def hello_world():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@app.get("/ui")
+def ui():
+    return FileResponse(BASE_DIR / "static" / "index.html")
 
 
 def download_video(url: str, allowed_hosts: set[str], site_name: str) -> FileResponse:
