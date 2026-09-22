@@ -5,7 +5,7 @@ import time
 import uvicorn
 import webview
 
-from main import app
+from app.main import app
 
 HOST = "127.0.0.1"
 

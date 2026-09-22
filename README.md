@@ -22,16 +22,30 @@ A FastAPI application with a hello world endpoint and a health check endpoint.
    pip install -r requirements.txt
    ```
 
+## Project structure
+
+```text
+app/
+  main.py             FastAPI app factory: mounts static files, includes routers
+  routers/
+    pages.py          /, /health, /ui
+    downloads.py      /download/facebook, /download/youtube
+  services/
+    video_downloader.py   yt-dlp download logic shared by the download routes
+  static/             Frontend served at /ui (index.html, style.css, app.js)
+desktop.py            Desktop entry point (pywebview window + background server)
+```
+
 ## Running
 
 ```powershell
-venv\Scripts\python.exe -m uvicorn main:app --reload
+venv\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
 
 Or, with the virtual environment activated:
 
 ```powershell
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 The app will be available at http://127.0.0.1:8000.
@@ -69,7 +83,7 @@ This opens a window loading the local UI. A free port is picked automatically ea
 2. Build:
 
    ```powershell
-   venv\Scripts\python.exe -m PyInstaller --noconfirm --onedir --name VideoDownloader --add-data "static;static" desktop.py
+   venv\Scripts\python.exe -m PyInstaller --noconfirm --onedir --name VideoDownloader --add-data "app/static;app/static" desktop.py
    ```
 
 3. The packaged app is at `dist\VideoDownloader\VideoDownloader.exe` — it can be copied/shared and run without Python installed on the target machine.

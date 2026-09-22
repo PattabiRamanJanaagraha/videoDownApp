@@ -3,41 +3,15 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import yt_dlp
-from fastapi import FastAPI, HTTPException
+from fastapi import HTTPException
 from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from starlette.background import BackgroundTask
 
-app = FastAPI()
-
-BASE_DIR = Path(__file__).parent
-DOWNLOAD_DIR = BASE_DIR / "downloads"
+DOWNLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "downloads"
 DOWNLOAD_DIR.mkdir(exist_ok=True)
-
-app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 FACEBOOK_HOSTS = {"facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch"}
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
-
-
-class DownloadRequest(BaseModel):
-    url: str
-
-
-@app.get("/")
-def hello_world():
-    return {"message": "Hello, World!"}
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-
-@app.get("/ui")
-def ui():
-    return FileResponse(BASE_DIR / "static" / "index.html")
 
 
 def download_video(url: str, allowed_hosts: set[str], site_name: str) -> FileResponse:
@@ -70,13 +44,3 @@ def download_video(url: str, allowed_hosts: set[str], site_name: str) -> FileRes
         media_type="video/mp4",
         background=BackgroundTask(file_path.unlink, missing_ok=True),
     )
-
-
-@app.post("/download/facebook")
-def download_facebook_video(request: DownloadRequest):
-    return download_video(request.url, FACEBOOK_HOSTS, "facebook.com or fb.watch")
-
-
-@app.post("/download/youtube")
-def download_youtube_video(request: DownloadRequest):
-    return download_video(request.url, YOUTUBE_HOSTS, "youtube.com or youtu.be")
