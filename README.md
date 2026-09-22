@@ -43,3 +43,4 @@ The app will be available at http://127.0.0.1:8000.
 | GET | `/` | Returns a hello world message |
 | GET | `/health` | Returns the app's health status |
 | POST | `/download/facebook` | Downloads a public Facebook video given `{"url": "..."}` and returns the MP4 file |
+| POST | `/download/youtube` | Downloads a public YouTube video given `{"url": "..."}` and returns the MP4 file |

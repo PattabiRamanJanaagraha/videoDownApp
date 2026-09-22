@@ -13,7 +13,8 @@ app = FastAPI()
 DOWNLOAD_DIR = Path(__file__).parent / "downloads"
 DOWNLOAD_DIR.mkdir(exist_ok=True)
 
-ALLOWED_HOSTS = {"facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch"}
+FACEBOOK_HOSTS = {"facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch"}
+YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
 
 
 class DownloadRequest(BaseModel):
@@ -30,11 +31,10 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.post("/download/facebook")
-def download_facebook_video(request: DownloadRequest):
-    host = urlparse(request.url).hostname or ""
-    if host not in ALLOWED_HOSTS:
-        raise HTTPException(status_code=400, detail="URL must be a facebook.com or fb.watch link")
+def download_video(url: str, allowed_hosts: set[str], site_name: str) -> FileResponse:
+    host = urlparse(url).hostname or ""
+    if host not in allowed_hosts:
+        raise HTTPException(status_code=400, detail=f"URL must be a {site_name} link")
 
     output_template = str(DOWNLOAD_DIR / f"{uuid.uuid4()}.%(ext)s")
     ydl_opts = {
@@ -46,7 +46,7 @@ def download_facebook_video(request: DownloadRequest):
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(request.url, download=True)
+            info = ydl.extract_info(url, download=True)
             file_path = Path(ydl.prepare_filename(info))
     except yt_dlp.utils.DownloadError as exc:
         raise HTTPException(status_code=422, detail=f"Failed to download video: {exc}") from exc
@@ -54,10 +54,20 @@ def download_facebook_video(request: DownloadRequest):
     if not file_path.exists():
         raise HTTPException(status_code=500, detail="Download completed but file was not found")
 
-    filename = f"{info.get('title', 'facebook_video')}{file_path.suffix}"
+    filename = f"{info.get('title', 'video')}{file_path.suffix}"
     return FileResponse(
         path=file_path,
         filename=filename,
         media_type="video/mp4",
         background=BackgroundTask(file_path.unlink, missing_ok=True),
     )
+
+
+@app.post("/download/facebook")
+def download_facebook_video(request: DownloadRequest):
+    return download_video(request.url, FACEBOOK_HOSTS, "facebook.com or fb.watch")
+
+
+@app.post("/download/youtube")
+def download_youtube_video(request: DownloadRequest):
+    return download_video(request.url, YOUTUBE_HOSTS, "youtube.com or youtu.be")
