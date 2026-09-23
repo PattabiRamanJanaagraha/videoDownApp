@@ -2,20 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Video Downloader</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body>
-  <main>
-    <h1>Video Downloader</h1>
-    <p>Paste a public Facebook or YouTube video link and download it as MP4.</p>
+<body class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+  <main class="w-full max-w-md">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-8">
+      <h1 class="text-2xl font-semibold tracking-tight">Video Downloader</h1>
+      <p class="mt-1 text-sm text-slate-400">
+        Paste a public Facebook or YouTube video link and download it as MP4.
+      </p>
 
-    <form id="download-form">
-      <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=..." required />
-      <button type="submit" id="submit-btn">Download</button>
-    </form>
+      <form id="download-form" class="mt-6 flex gap-2">
+        <input
+          type="url"
+          id="url"
+          placeholder="https://www.youtube.com/watch?v=..."
+          required
+          class="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+        />
+        <button
+          type="submit"
+          id="submit-btn"
+          class="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        >
+          Download
+        </button>
+      </form>
 
-    <p id="status"></p>
+      <div id="status" class="mt-4 hidden rounded-lg border px-4 py-3 text-sm flex items-center gap-3">
+        <svg id="status-spinner" class="hidden animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <svg id="status-success" class="hidden h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z" clip-rule="evenodd"/>
+        </svg>
+        <svg id="status-error" class="hidden h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 102 0 1 1 0 00-2 0zm1-9a1 1 0 00-1 1v4a1 1 0 002 0V5a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <span id="status-text"></span>
+      </div>
+    </div>
   </main>
 
   <script src="/static/app.js"></script>

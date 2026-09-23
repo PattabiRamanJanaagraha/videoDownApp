@@ -2,6 +2,27 @@ const form = document.getElementById("download-form");
 const urlInput = document.getElementById("url");
 const submitBtn = document.getElementById("submit-btn");
 const status = document.getElementById("status");
+const statusText = document.getElementById("status-text");
+const statusSpinner = document.getElementById("status-spinner");
+const statusSuccess = document.getElementById("status-success");
+const statusError = document.getElementById("status-error");
+
+const STATUS_STYLES = {
+  progress: "border-slate-700 bg-slate-800 text-slate-200",
+  success: "border-emerald-800 bg-emerald-950 text-emerald-300",
+  error: "border-red-800 bg-red-950 text-red-300",
+};
+
+function setStatus(kind, message) {
+  status.classList.remove("hidden");
+  status.className = `mt-4 rounded-lg border px-4 py-3 text-sm flex items-center gap-3 ${STATUS_STYLES[kind]}`;
+
+  statusSpinner.classList.toggle("hidden", kind !== "progress");
+  statusSuccess.classList.toggle("hidden", kind !== "success");
+  statusError.classList.toggle("hidden", kind !== "error");
+
+  statusText.textContent = message;
+}
 
 function endpointFor(url) {
   const host = new URL(url).hostname;
@@ -26,12 +47,12 @@ form.addEventListener("submit", async (event) => {
   const endpoint = endpointFor(url);
 
   if (!endpoint) {
-    status.textContent = "Only Facebook and YouTube links are supported.";
+    setStatus("error", "Only Facebook and YouTube links are supported.");
     return;
   }
 
   submitBtn.disabled = true;
-  status.textContent = "Downloading… this can take a moment.";
+  setStatus("progress", "Downloading… this can take a moment.");
 
   try {
     const response = await fetch(endpoint, {
@@ -55,9 +76,9 @@ form.addEventListener("submit", async (event) => {
     link.click();
     URL.revokeObjectURL(objectUrl);
 
-    status.textContent = `Saved: ${filename}`;
+    setStatus("success", `Saved: ${filename}`);
   } catch (err) {
-    status.textContent = `Error: ${err.message}`;
+    setStatus("error", `Error: ${err.message}`);
   } finally {
     submitBtn.disabled = false;
   }
