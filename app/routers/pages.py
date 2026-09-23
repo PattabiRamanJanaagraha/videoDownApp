@@ -9,8 +9,8 @@ router = APIRouter()
 
 
 @router.get("/")
-def hello_world():
-    return {"message": "Hello, World!"}
+def root():
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @router.get("/health")
@@ -21,3 +21,8 @@ def health_check():
 @router.get("/ui")
 def ui():
     return FileResponse(STATIC_DIR / "index.html")
+
+
+@router.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse(STATIC_DIR / "favicon.ico")

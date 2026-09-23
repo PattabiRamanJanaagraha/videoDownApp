@@ -28,7 +28,7 @@ A FastAPI application with a hello world endpoint and a health check endpoint.
 app/
   main.py             FastAPI app factory: mounts static files, includes routers
   routers/
-    pages.py          /, /health, /ui
+    pages.py          /, /health, /ui, /favicon.ico
     downloads.py      /download/facebook, /download/youtube
   services/
     video_downloader.py   yt-dlp download logic shared by the download routes
@@ -54,11 +54,12 @@ The app will be available at http://127.0.0.1:8000.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/` | Returns a hello world message |
+| GET | `/` | Serves the frontend for pasting a link and downloading |
 | GET | `/health` | Returns the app's health status |
 | POST | `/download/facebook` | Downloads a public Facebook video given `{"url": "..."}` and returns the MP4 file |
 | POST | `/download/youtube` | Downloads a public YouTube video given `{"url": "..."}` and returns the MP4 file |
-| GET | `/ui` | Serves the browser/desktop frontend for pasting a link and downloading |
+| GET | `/ui` | Same frontend as `/`, kept for the desktop app entrypoint |
+| GET | `/favicon.ico` | Serves the app's favicon |
 
 ## Desktop app
 
