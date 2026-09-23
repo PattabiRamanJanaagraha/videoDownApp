@@ -1,3 +1,4 @@
+import tempfile
 import uuid
 from pathlib import Path
 from urllib.parse import urlparse
@@ -7,8 +8,8 @@ from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
 
-DOWNLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "downloads"
-DOWNLOAD_DIR.mkdir(exist_ok=True)
+DOWNLOAD_DIR = Path(tempfile.gettempdir()) / "any-video-downloader"
+DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 FACEBOOK_HOSTS = {"facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch"}
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
