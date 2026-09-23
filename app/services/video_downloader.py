@@ -36,8 +36,12 @@ def _cookies_file() -> str | None:
         return None
 
     if _cookies_file_cache is None:
+        # Env var UIs (e.g. Vercel's dashboard) often collapse or escape
+        # newlines when a multi-line secret is pasted in; un-escape them so
+        # the Netscape cookie file format (one cookie per line) survives.
+        normalized = cookies_content.replace("\\r\\n", "\n").replace("\\n", "\n")
         _cookies_file_cache = DOWNLOAD_DIR / "cookies.txt"
-        _cookies_file_cache.write_text(cookies_content, encoding="utf-8")
+        _cookies_file_cache.write_text(normalized, encoding="utf-8")
 
     return str(_cookies_file_cache)
 
@@ -68,7 +72,14 @@ def download_video(url: str, allowed_hosts: set[str], site_name: str) -> FileRes
             info = ydl.extract_info(url, download=True)
             file_path = Path(ydl.prepare_filename(info))
     except yt_dlp.utils.DownloadError as exc:
-        raise HTTPException(status_code=422, detail=f"Failed to download video: {exc}") from exc
+        detail = f"Failed to download video: {exc}"
+        if "Sign in to confirm" in str(exc) and not cookies_file:
+            detail += (
+                " — this server has no YouTube cookies configured. Set the "
+                "YTDLP_COOKIES (or YTDLP_COOKIES_FILE) environment variable "
+                "with an exported cookies.txt; see README.md for steps."
+            )
+        raise HTTPException(status_code=422, detail=detail) from exc
 
     if not file_path.exists():
         raise HTTPException(status_code=500, detail="Download completed but file was not found")

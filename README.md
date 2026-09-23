@@ -69,9 +69,10 @@ If a video still fails with that error, supply your own YouTube cookies (this is
 
 1. While signed in to YouTube in your browser, export cookies in Netscape format (e.g. with the "Get cookies.txt LOCALLY" browser extension).
 2. **Local/desktop use:** save the file somewhere on disk and set `YTDLP_COOKIES_FILE` to its path before running. Never commit this file — it's equivalent to a login session (`cookies.txt` is already in `.gitignore`).
-3. **Vercel/serverless use:** since there's no persistent filesystem to point a path at, instead set an environment variable `YTDLP_COOKIES` in the Vercel project's settings containing the full contents of the cookies file. It's written to the function's temp dir on first use each cold start.
+3. **Vercel/serverless use:** since there's no persistent filesystem to point a path at, instead set an environment variable `YTDLP_COOKIES` in the Vercel project's settings containing the full contents of the cookies file. It's written to the function's temp dir on first use each cold start. Paste the file's contents as-is — real newlines or literal `\n` sequences (common when a dashboard's input mangles multi-line paste) are both normalized before writing.
+4. Redeploy after adding the env var — existing deployments/cold starts won't pick it up otherwise.
 
-Treat both values as secrets — anyone with them can act as your signed-in YouTube session.
+Treat both values as secrets — anyone with them can act as your signed-in YouTube session. If a download still fails after this, the app's error message will now say explicitly whether cookies were even configured for that attempt.
 
 ## Desktop app
 
