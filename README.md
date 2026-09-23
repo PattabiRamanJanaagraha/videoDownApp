@@ -61,6 +61,18 @@ The app will be available at http://127.0.0.1:8000.
 | GET | `/ui` | Same frontend as `/`, kept for the desktop app entrypoint |
 | GET | `/favicon.ico` | Serves the app's favicon |
 
+## Troubleshooting YouTube "Sign in to confirm you're not a bot"
+
+YouTube's bot-check triggers far more often from datacenter IPs (like Vercel's) than from a home IP. `app/services/video_downloader.py` already asks yt-dlp to try the `android`/`ios` clients first, which avoids the check for many videos with no setup needed.
+
+If a video still fails with that error, supply your own YouTube cookies (this is yt-dlp's own documented fix, see the [FAQ](https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp)):
+
+1. While signed in to YouTube in your browser, export cookies in Netscape format (e.g. with the "Get cookies.txt LOCALLY" browser extension).
+2. **Local/desktop use:** save the file somewhere on disk and set `YTDLP_COOKIES_FILE` to its path before running. Never commit this file — it's equivalent to a login session (`cookies.txt` is already in `.gitignore`).
+3. **Vercel/serverless use:** since there's no persistent filesystem to point a path at, instead set an environment variable `YTDLP_COOKIES` in the Vercel project's settings containing the full contents of the cookies file. It's written to the function's temp dir on first use each cold start.
+
+Treat both values as secrets — anyone with them can act as your signed-in YouTube session.
+
 ## Desktop app
 
 The same FastAPI app can run inside a native desktop window via [pywebview](https://pywebview.flowrl.com/), with the API server running in a background thread.

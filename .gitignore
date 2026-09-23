@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 downloads/
 .env
+cookies.txt
 build/
 dist/
 *.spec
